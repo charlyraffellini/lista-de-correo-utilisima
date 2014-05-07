@@ -13,14 +13,13 @@ class MailObserver implements PostObserver {
 
 	override send(Post post) {
 		val lista = post.destino
-		lista.getMailsDestino(post).forEach [ mailDestino |
-			var mail = new Mail
-			mail.from = post.emisor.mail
-			mail.titulo = "[" + lista.encabezado + "] nuevo post"
-			mail.message = post.mensaje
-			mail.to = mailDestino
-			messageSender.send(mail)
-		]
+		var mailsDeDestino = lista.getMailsDestino(post).join(",")
+		var mail = new Mail
+		mail.from = post.emisor.mail
+		mail.titulo = "[" + lista.encabezado + "] nuevo post"
+		mail.message = post.mensaje
+		mail.to = mailsDeDestino
+		messageSender.send(mail)
 	}
 
 }
