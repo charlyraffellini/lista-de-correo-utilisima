@@ -11,6 +11,7 @@ import static org.mockito.Matchers.*
 import static org.mockito.Mockito.*
 import org.junit.Assert
 import MalasPalabrasObserver.MalasPalabrasObserver
+import ar.edu.listaCorreo.observers.BloqueoUsuarioVerbosoObserver
 
 class TestEnvioPosts {
 
@@ -84,6 +85,19 @@ class TestEnvioPosts {
 		malasPalabrasObserver.agregarMalaPalabra("podrido")
 		listaAlumnos.enviar(mensajeFeo)
 		Assert.assertEquals(1, malasPalabrasObserver.mensajesConMalasPalabras.size)
+	}
+	
+	@Test
+	def void cuandoUnAlumnoMandaMuchosMensajesQuedaBloqueado(){
+		listaAlumnos.agregarPostObserver(new BloqueoUsuarioVerbosoObserver)
+		val mensaje = new Post(alumno, "Una consulta: como se hace el TP?", listaAlumnos)
+		listaAlumnos.enviar(mensaje)
+		listaAlumnos.enviar(mensaje)
+		listaAlumnos.enviar(mensaje)
+		listaAlumnos.enviar(mensaje)
+		listaAlumnos.enviar(mensaje)
+		listaAlumnos.enviar(mensaje)
+		Assert.assertTrue(alumno.bloqueado)
 	}
 
 	/*************************************************************/
