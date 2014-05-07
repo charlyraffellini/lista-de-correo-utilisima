@@ -10,6 +10,7 @@ import static org.mockito.Matchers.*
 import static org.mockito.Mockito.*
 import ar.edu.listaCorreo.senders.StubMailSender
 import ar.edu.listaCorreo.senders.MailSenderProvider
+import ar.edu.listaCorreo.senders.MessageSender
 
 class TestEnvioPosts {
 
@@ -75,26 +76,24 @@ class TestEnvioPosts {
 		Assert.assertEquals(1, stubMailSender.mailsDe("alumno@uni.edu.ar").size)
 	}
 
-
 	/*************************************************************/
 	/*                     TESTS CON MOCKS                       */
 	/*                  TEST DE COMPORTAMIENTO                   */
 	/*************************************************************/
 	
-//TODO: 
-//	@Test
-//	def void testEnvioPostAListaAlumnosLlegaATodosLosOtrosSuscriptos() {
-//		//creacion de mock
-//		var mockedMailSender = mock(typeof(MessageSender))
-//		listaAlumnos.agregarPostObserver(new MailObserver(mockedMailSender))
-//
-//		// un alumno envía un mensaje a la lista
-//		listaAlumnos.enviar(mensajeDodainAlumnos)
-//
-//		//verificacion
-//		//test de comportamiento, verifico que se enviaron 2 mails 
-//		// a fede y a deby, no así a dodi que fue el que envió el post
-//		verify(mockedMailSender, times(2)).send(any(typeof(Mail)))
-//	}
+	@Test
+	def void testEnvioPostAListaAlumnosLlegaATodosLosOtrosSuscriptos() {
+		//creacion de mock
+		var mockedMailSender = mock(typeof(MessageSender))
+		MailSenderProvider.setInstance(mockedMailSender)
+
+		// un alumno envía un mensaje a la lista
+		listaAlumnos.enviar(mensajeDodainAlumnos)
+
+		//verificacion
+		//test de comportamiento, verifico que se enviaron 2 mails 
+		// a fede y a deby, no así a dodi que fue el que envió el post
+		verify(mockedMailSender, times(2)).send(any(typeof(Mail)))
+	}
 	
 }
