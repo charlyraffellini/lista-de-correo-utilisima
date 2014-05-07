@@ -1,16 +1,15 @@
 package ar.edu.listaCorreo
 
-import ar.edu.listaCorreo.exceptions.BusinessException
-import ar.edu.listaCorreo.senders.Mail
-import org.junit.Assert
+import ar.edu.listaCorreo.senders.StubMailSender
 import org.junit.Before
+import ar.edu.listaCorreo.observers.MailObserver
+import ar.edu.listaCorreo.exceptions.BusinessException
 import org.junit.Test
-
+import ar.edu.listaCorreo.senders.Mail
+import ar.edu.listaCorreo.senders.MessageSender
 import static org.mockito.Matchers.*
 import static org.mockito.Mockito.*
-import ar.edu.listaCorreo.senders.StubMailSender
-import ar.edu.listaCorreo.senders.MailSenderProvider
-import ar.edu.listaCorreo.senders.MessageSender
+import org.junit.Assert
 
 class TestEnvioPosts {
 
@@ -28,9 +27,7 @@ class TestEnvioPosts {
 
 	@Before
 	def void init() {
-		/** Seteo MailSender para tests */
-		MailSenderProvider.setInstance(stubMailSender)
-		
+
 		/** Listas de correo */
 		listaAlumnos = Lista.listaAbierta()
 		listaProfes = Lista.listaCerrada()
@@ -48,11 +45,13 @@ class TestEnvioPosts {
 		listaProfes.agregarMiembro(dodain)
 		listaProfes.agregarMiembro(nico)
 		listaProfes.agregarMiembro(deby)
+		listaProfes.agregarPostObserver(new MailObserver(stubMailSender))
 
 		/** en la de alumnos hay alumnos y profes */
 		listaAlumnos.agregarMiembro(dodain)
 		listaAlumnos.agregarMiembro(deby)
 		listaAlumnos.agregarMiembro(fede)
+		listaAlumnos.agregarPostObserver(new MailObserver(stubMailSender))
 
 		mensajeAlumno = new Post(alumno, "Hola, queria preguntar que es la recursividad", listaProfes)
 		mensajeDodainAlumnos = new Post(dodain,
@@ -80,12 +79,11 @@ class TestEnvioPosts {
 	/*                     TESTS CON MOCKS                       */
 	/*                  TEST DE COMPORTAMIENTO                   */
 	/*************************************************************/
-	
 	@Test
 	def void testEnvioPostAListaAlumnosLlegaATodosLosOtrosSuscriptos() {
 		//creacion de mock
 		var mockedMailSender = mock(typeof(MessageSender))
-		MailSenderProvider.setInstance(mockedMailSender)
+		listaAlumnos.agregarPostObserver(new MailObserver(mockedMailSender))
 
 		// un alumno envía un mensaje a la lista
 		listaAlumnos.enviar(mensajeDodainAlumnos)

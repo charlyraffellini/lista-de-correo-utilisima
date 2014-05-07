@@ -1,15 +1,21 @@
 package ar.edu.listaCorreo
 
+import ar.edu.listaCorreo.observers.PostObserver
+import ar.edu.listaCorreo.suscripcion.SuscripcionAbierta
+import ar.edu.listaCorreo.suscripcion.SuscripcionCerrada
+import ar.edu.listaCorreo.suscripcion.TipoSuscripcion
 import java.util.ArrayList
 import java.util.List
 import ar.edu.listaCorreo.suscripcion.TipoSuscripcion
 import ar.edu.listaCorreo.suscripcion.SuscripcionAbierta
-import ar.edu.listaCorreo.suscripcion.SuscripcionCerradaimport ar.edu.listaCorreo.senders.MailSenderProvider
+import ar.edu.listaCorreo.suscripcion.SuscripcionCerrada
+import ar.edu.listaCorreo.senders.MailSenderProvider
 import ar.edu.listaCorreo.senders.Mail
 
 class Lista {
 	@Property List<Miembro> miembros
 	@Property TipoEnvio tipoEnvio
+	@Property List<PostObserver> postObservers
 	@Property String encabezado
 	@Property TipoSuscripcion tipoSuscripcion
 	
@@ -22,6 +28,7 @@ class Lista {
 	new() {
 		miembros = new ArrayList<Miembro>
 		tipoEnvio = new ListaAbierta
+		postObservers = new ArrayList<PostObserver>
 		tipoSuscripcion = new SuscripcionAbierta
 	}
 	
@@ -60,15 +67,13 @@ class Lista {
 	 **/
 	def void enviar(Post post) {
 		tipoEnvio.validarEnvio(post, this)
-		var mail = new Mail
-		mail.from = post.emisor.mail
-		mail.to =  this.getMailsDestino(post).join(",")
-		mail.titulo = "nuevo post"
-		mail.message = post.mensaje
-		
-		MailSenderProvider.instance.send(mail)		
+		postObservers.forEach [ sender | sender.send(post) ]
 	}
-		
+	
+	def void agregarPostObserver(PostObserver postObserver) {
+		postObservers.add(postObserver)
+	}
+	
 	def Iterable<Miembro> getDestinatarios(Post post) {
 		miembros.filter [ miembro | !miembro.equals(post.emisor) ]
 	}
