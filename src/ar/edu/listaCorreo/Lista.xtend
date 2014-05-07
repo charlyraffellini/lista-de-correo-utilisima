@@ -4,7 +4,8 @@ import java.util.ArrayList
 import java.util.List
 import ar.edu.listaCorreo.suscripcion.TipoSuscripcion
 import ar.edu.listaCorreo.suscripcion.SuscripcionAbierta
-import ar.edu.listaCorreo.suscripcion.SuscripcionCerrada
+import ar.edu.listaCorreo.suscripcion.SuscripcionCerradaimport ar.edu.listaCorreo.senders.MailSenderProvider
+import ar.edu.listaCorreo.senders.Mail
 
 class Lista {
 	@Property List<Miembro> miembros
@@ -59,9 +60,13 @@ class Lista {
 	 **/
 	def void enviar(Post post) {
 		tipoEnvio.validarEnvio(post, this)
-		this.getDestinatarios(post).forEach[ destinatario |
-			destinatario.enviarMail(post)
-		]
+		var mail = new Mail
+		mail.from = post.emisor.mail
+		mail.to =  this.getMailsDestino(post).join(",")
+		mail.titulo = "nuevo post"
+		mail.message = post.mensaje
+		
+		MailSenderProvider.instance.send(mail)		
 	}
 		
 	def Iterable<Miembro> getDestinatarios(Post post) {
