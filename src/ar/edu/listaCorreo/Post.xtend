@@ -1,5 +1,7 @@
 package ar.edu.listaCorreo
 
+import java.util.List
+
 class Post {
 
 	@Property Miembro emisor
@@ -10,5 +12,13 @@ class Post {
 		emisor = pEmisor
 		mensaje = pMensaje
 		destino = pDestino
+	}
+	
+	def tiene(String palabra) {
+		palabrasDelMensaje.contains(palabra)
+	}
+
+	def List<String> palabrasDelMensaje() {
+		mensaje.split(" ")
 	}
 }

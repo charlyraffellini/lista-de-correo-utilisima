@@ -10,6 +10,7 @@ import ar.edu.listaCorreo.senders.MessageSender
 import static org.mockito.Matchers.*
 import static org.mockito.Mockito.*
 import org.junit.Assert
+import MalasPalabrasObserver.MalasPalabrasObserver
 
 class TestEnvioPosts {
 
@@ -24,6 +25,7 @@ class TestEnvioPosts {
 	Post mensajeDodainAlumnos
 	Post mensajeDodainProfes
 	StubMailSender stubMailSender = new StubMailSender
+	MalasPalabrasObserver malasPalabrasObserver = new MalasPalabrasObserver
 
 	@Before
 	def void init() {
@@ -52,6 +54,7 @@ class TestEnvioPosts {
 		listaAlumnos.agregarMiembro(deby)
 		listaAlumnos.agregarMiembro(fede)
 		listaAlumnos.agregarPostObserver(new MailObserver(stubMailSender))
+		listaAlumnos.agregarPostObserver(malasPalabrasObserver)
 
 		mensajeAlumno = new Post(alumno, "Hola, queria preguntar que es la recursividad", listaProfes)
 		mensajeDodainAlumnos = new Post(dodain,
@@ -73,6 +76,14 @@ class TestEnvioPosts {
 		Assert.assertEquals(0, stubMailSender.mailsDe("alumno@uni.edu.ar").size)
 		listaAlumnos.enviar(mensajeAlumno)
 		Assert.assertEquals(1, stubMailSender.mailsDe("alumno@uni.edu.ar").size)
+	}
+	
+	@Test
+	def void alumnoEnviaMailConMalaPalabra() {
+		val mensajeFeo = new Post(alumno, "Cuál es loco! Me tienen podrido", listaAlumnos)
+		malasPalabrasObserver.agregarMalaPalabra("podrido")
+		listaAlumnos.enviar(mensajeFeo)
+		Assert.assertEquals(1, malasPalabrasObserver.mensajesConMalasPalabras.size)
 	}
 
 	/*************************************************************/
