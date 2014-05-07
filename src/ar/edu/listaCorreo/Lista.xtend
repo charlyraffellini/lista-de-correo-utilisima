@@ -68,6 +68,7 @@ class Lista {
 	def void enviar(Post post) {
 		tipoEnvio.validarEnvio(post, this)
 		postObservers.forEach [ sender | sender.send(post) ]
+		post.emisor.incrementarMailsEnviados()
 	}
 	
 	def void agregarPostObserver(PostObserver postObserver) {
